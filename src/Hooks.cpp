@@ -1,5 +1,5 @@
-#pragma once
 #include "Hooks.h"
+#include "RE/S/ScriptEventSourceHolder.h"
 #include "hooks/CopyFromTemplateHook.h"
 #include "hooks/CopyNPCHook.h"
 #include "hooks/DtorNPCHook.h"

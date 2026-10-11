@@ -1,12 +1,14 @@
 #pragma once
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <functional>
-#include <unordered_map>
-#include <map>
+#include "RE/B/BGSListForm.h"
+#include "RE/B/BSResourceNiBinaryStream.h"
 #include "RaceSwapUtils.h"
 #include "settings/Settings.h"
+#include <algorithm>
+#include <functional>
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace raceswap
 {
@@ -345,13 +347,21 @@ namespace raceswap
 
 				switch (form->GetFormType()) {
 					case RE::FormType::HeadPart:
+					{
 						parseHeadpart(form->As<RE::BGSHeadPart>());
 						break;
+					}
 					case RE::FormType::Race:
-						parseRace(form->As<RE::TESRace>());	
+					{
+						parseRace(form->As<RE::TESRace>());
 						break;
+					}
 					case RE::FormType::NPC:
+					{
 						parseNPC(form->As<RE::TESNPC>());
+						break;
+					}
+					default:
 						break;
 				}
 			}
@@ -507,7 +517,7 @@ namespace raceswap
 						for (auto& headpart : headparts) {
 							logger::debug("SEX: {} TYPE: {} RACE: {} {:x} HEADPART: {} {:x} HDPT: {} {} {}",
 								sexString,
-								type,
+								(std::uint32_t) type,
 								race->formEditorID,
 								race->formID,
 								headpart.first->formEditorID,

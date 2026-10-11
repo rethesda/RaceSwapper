@@ -1,10 +1,11 @@
 #pragma once
 #include "PCH.h"
-#include <random>
+#include "RE/T/TESRace.h"
+#include "Utils.h"
 #include <functional>
+#include <random>
 #include <string>
 #include <unordered_map>
-#include "Utils.h"
 
 namespace raceutils
 {
@@ -68,7 +69,7 @@ namespace raceutils
 			_random_num = _hash_seed;
 		}
 
-		inline const size_t GetHashSeed() const {
+		inline size_t GetHashSeed() const {
 			return _hash_seed;
 		}
 

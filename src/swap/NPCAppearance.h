@@ -1,4 +1,7 @@
 #pragma once
+#include "RE/B/BGSBehaviorGraphModel.h"
+#include "RE/B/BGSTextureModel.h"
+#include "RE/T/TESRace.h"
 #include "configuration/Configuration.h"
 
 class NPCAppearance
@@ -46,8 +49,8 @@ public:
 	static_assert(offsetof(NPCData, headParts) == 0x238);
 	static_assert(offsetof(NPCData, numHeadParts) == 0x240);
 
-	NPCData originalNPCData = { 0 };
-	NPCData alteredNPCData = { 0 };
+	NPCData originalNPCData = {};
+	NPCData alteredNPCData = {};
 
 	bool isNPCSwapped = false;
 

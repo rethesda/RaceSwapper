@@ -1,7 +1,39 @@
-#pragma once
 #include "ConfigurationEntry.h"
-#include "Utils.h"
 #include "MergeMapperPluginAPI.h"
+#include "RE/T/TESDataHandler.h"
+#include "RE/T/TESFaction.h"
+#include "RE/T/TESRace.h"
+#include "Utils.h"
+
+namespace
+{
+	std::string SexToString(const RE::SEX a_sex)
+	{
+		switch (a_sex) {
+		case RE::SEX::kNone:
+		{
+			return "NONE";
+			break;
+		}
+		case RE::SEX::kMale:
+		{
+			return "MALE";
+			break;
+		}
+		case RE::SEX::kFemale:
+		{
+			return "FEMALE";
+			break;
+		}
+		default:
+		{
+			return "INVALID";
+			break;
+		}
+		}
+	}
+}
+
 
 // https://codereview.stackexchange.com/questions/40124/trim-white-space-from-string
 std::string trimLine(std::string a_line) {
@@ -99,8 +131,8 @@ RE::TESForm* GetFormFromString(std::string line)
 std::uint32_t GetPercentageFromString(std::string line)
 {
 	if (line.find('%') != std::string::npos) {
-		auto percent = std::stoul(line.substr(0, line.find('%')), nullptr, 10);
-		return (std::uint32_t) max(0, min(100, percent));
+		const int percent = std::stoul(line.substr(0, line.find('%')), nullptr, 10);
+		return (std::uint32_t) std::max(0, std::min(100, percent));
 	}
 
 	return (std::uint32_t) -1;
@@ -211,7 +243,7 @@ bool ConstructSwapData(std::string a_line, ConfigurationEntry::EntryData* a_data
 ConfigurationEntry* ConfigurationEntry::ConstructNewEntry(std::string a_line, std::string a_file)
 {
 	auto parsingLine = std::string(a_line);
-	ConfigurationEntry::EntryData entryData{ 0 };
+	EntryData entryData {};
 
 	/////////// Default Values /////////////
 	entryData.weight = 10;
@@ -263,10 +295,10 @@ ConfigurationEntry* ConfigurationEntry::ConstructNewEntry(std::string a_line, st
 		logger::debug("Converted entry: matchNPC={:x}", entryData.npcMatch ? entryData.npcMatch->formID : 0);
 		logger::debug("Converted entry: matchRace={:x}", entryData.raceMatch ? entryData.raceMatch->formID : 0);
 		logger::debug("Converted entry: matchFaction={:x}", entryData.factionMatch ? entryData.factionMatch->formID : 0);
-		logger::debug("Converted entry: matchSex={}", entryData.sexMatch);
+		logger::debug("Converted entry: matchSex={}", SexToString(entryData.sexMatch));
 		logger::debug("Converted entry: swapNPC={:x}", entryData.otherNPC ? entryData.otherNPC->formID : 0);
 		logger::debug("Converted entry: swapRace={:x}", entryData.otherRace ? entryData.otherRace->formID : 0);
-		logger::debug("Converted entry: swapSex={}", entryData.otherSex);
+		logger::debug("Converted entry: swapSex={}", SexToString(entryData.otherSex));
 		return newEntry;
 	}
 	logger::error("line: \"{}\" is invalid", a_line);

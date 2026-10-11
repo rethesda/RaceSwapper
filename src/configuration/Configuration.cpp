@@ -1,4 +1,3 @@
-#pragma once
 #include "Configuration.h"
 #include "Utils.h"
 
@@ -69,7 +68,7 @@ AppearanceConfiguration* ConfigurationDatabase::GetConfigurationForNPC(RE::TESNP
 	}
 
 	if (!matchedEntries.empty()) {
-		auto config = new AppearanceConfiguration{ 0 };
+		auto config = new AppearanceConfiguration{};
 		auto matchedEntry = PickRandomWeightedEntry(matchedEntries, a_npc);
 		config->otherRace = matchedEntry->entryData.otherRace;
 		config->otherNPC = matchedEntry->entryData.otherNPC;

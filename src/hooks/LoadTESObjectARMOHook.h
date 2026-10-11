@@ -1,4 +1,6 @@
 #pragma once
+#include "RE/T/TESObjectARMA.h"
+#include "RE/F/FormTraits.h"
 #include "Utils.h"
 #include "swap/NPCAppearance.h"
 
@@ -34,8 +36,8 @@ struct LoadTESObjectARMOHook
 	}
 
 	using BipedObjectSlot = stl::enumeration<RE::BGSBipedObjectForm::BipedObjectSlot, std::uint32_t>;
-	
-		
+
+
 	// Overwrite TESObjectARMO::AttachToBiped functionality. This hook will let us load the armor with
 	// the closest valid race
 	static void AttachToBiped(RE::TESObjectARMO* a_armor, RE::Actor* a_actor, RE::TESRace* a_race, RE::BipedAnim** a_anim, bool isFemale)
@@ -55,12 +57,12 @@ struct LoadTESObjectARMOHook
 		}
 
 		// Preserve SOS slot
-		BipedObjectSlot ppSlot = a_armor->bipedModelData.bipedObjectSlots & RE::BGSBipedObjectForm::BipedObjectSlot::kModPelvisSecondary;
+		auto ppSlot = a_armor->bipedModelData.bipedObjectSlots & RE::BGSBipedObjectForm::BipedObjectSlot::kModPelvisSecondary;
 
 		if (armorSlotMap.contains(a_armor)) {
 			a_armor->bipedModelData.bipedObjectSlots = armorSlotMap.at(a_armor);
 		} else {
-			armorSlotMap.emplace(a_armor, a_armor->bipedModelData.bipedObjectSlots);
+			armorSlotMap.emplace(a_armor, a_armor->bipedModelData.bipedObjectSlots.get());
 		}
 
 		auto origSlots = a_armor->bipedModelData.bipedObjectSlots;
@@ -98,17 +100,18 @@ struct LoadTESObjectARMOHook
 	}
 
 	// Take the armor's biped slots, and remove the slots that no valid addon for the race supports
-	static stl::enumeration<RE::BGSBipedObjectForm::BipedObjectSlot, std::uint32_t> GetCorrectBipedSlots(RE::TESObjectARMO* a_armor, RE::TESRace* a_race)
+	static REX::EnumSet<RE::BGSBipedObjectForm::BipedObjectSlot, std::uint32_t> GetCorrectBipedSlots(RE::TESObjectARMO* a_armor, RE::TESRace* a_race)
 	{
-		BipedObjectSlot addonSlots = RE::BGSBipedObjectForm::BipedObjectSlot::kNone;
-		BipedObjectSlot armorSlots = a_armor->bipedModelData.bipedObjectSlots;
-		for (auto addon : a_armor->armorAddons) {
+		std::uint32_t addonSlots = 0;
+		const auto armorSlots = a_armor->bipedModelData.bipedObjectSlots;
+		for (const auto addon : a_armor->armorAddons) {
 			if (addon->race == a_race || utils::is_amongst(addon->additionalRaces, a_race)) {
-				addonSlots |= addon->bipedModelData.bipedObjectSlots;
+				addonSlots |= addon->bipedModelData.bipedObjectSlots.underlying();
 			}
 		}
 
-		return armorSlots & addonSlots;
+		// Clear all slots that are not in the addon slots
+		return armorSlots & static_cast<RE::BGSBipedObjectForm::BipedObjectSlot>(addonSlots);
 	}
 
 	static void AddToBiped(RE::TESObjectARMA* a_addon, RE::TESObjectARMO* a_armor, RE::BipedAnim** a_anim, bool isFemale)
@@ -119,14 +122,14 @@ struct LoadTESObjectARMOHook
 	static void CallAttachToBipedDAV(RE::TESObjectARMO* a_armor, RE::TESRace* a_appearanceRace, RE::Actor* a_actor, RE::BipedAnim** a_anim, bool isFemale) {
 		auto originalRace = a_actor->GetRace();
 		a_actor->GetActorRuntimeData().race = a_appearanceRace;
-		
+
 		auto originalAppearanceArmorRace = a_appearanceRace->armorParentRace;
 		a_appearanceRace->armorParentRace = nullptr;
 
 		AttachToBipedDAV(a_armor, a_actor, a_anim, isFemale);
 
 		a_actor->GetActorRuntimeData().race = originalRace;
-		
+
 		a_appearanceRace->armorParentRace = originalAppearanceArmorRace;
 	}
 
@@ -145,7 +148,7 @@ struct LoadTESObjectARMOHook
 
 	static inline std::map<RE::TESObjectARMO*, BipedObjectSlot> armorSlotMap;
 
-	static const inline bool isDAVOrDDNGActive() {
+	static inline bool isDAVOrDDNGActive() {
 		static auto DAVHandle = GetModuleHandleA("DynamicArmorVariants");
 		static auto DDNGHandle = GetModuleHandleA("DeviousDevices");
 		return DAVHandle != nullptr || DDNGHandle != nullptr;
@@ -159,11 +162,11 @@ struct LoadTESObjectARMOHook
 
 			REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(24232, 24736), REL::VariantOffset(0x302, 0x302, 0x302) };
 			stl::write_thunk_call<LoadTESObjectARMOHook>(target.address());
-	
+
 			logger::info("LoadTESObjectARMOHook hooked at address {:x}", target.address());
 			logger::info("LoadTESObjectARMOHook hooked at offset {:x}", target.offset());
 		} else {
-			InstallForDAVAndDDNG();	
+			InstallForDAVAndDDNG();
 		}
 
 		REL::Relocation<std::uintptr_t> target2{ RELOCATION_ID(24233, 24737), REL::VariantOffset(0x78, 0x78, 0x78) };
@@ -182,10 +185,10 @@ struct LoadTESObjectARMOHook
 
 	static inline void InstallForDAVAndDDNG() {
 		logger::info("LoadTESObjectARMOHook installing compatibility hook for DAV and/or DDNG");
-		byte originalBytes[] = { 
-			(byte)0x44, (byte)0x8B, (byte)0x49, (byte)0x38, (byte)0x41, (byte)0x83, (byte)0xE1, (byte)0x01, (byte)0x48,
-			(byte)0x8B, (byte)0x91, (byte)0x58, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x48, (byte)0x8B, (byte)0xCD, (byte)0xE8, (byte)0x79,
-			(byte)0x44, (byte)0xEC, (byte)0xFF 
+		uint8_t originalBytes[] = {
+			0x44, 0x8B, 0x49, 0x38, 0x41, 0x83, 0xE1, 0x01, 0x48,
+			0x8B, 0x91, 0x58, 0x01, 0x00, 0x00, 0x48, 0x8B, 0xCD, 0xE8, 0x79,
+			0x44, 0xEC, 0xFF
 		};
 
 		REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(24232, 24736), REL::VariantOffset(0x2F0, 0x2F0, 0x2F0) };
@@ -196,7 +199,7 @@ struct LoadTESObjectARMOHook
 
 		// Fill back in the original Skyrim logic. Our hook will run first using the original skyrim logic before handing control to DAV
 		REL::safe_write(target.address(), originalBytes, 0x17);
-		
+
 		stl::write_thunk_call<LoadTESObjectARMOHook>(target.address() + 0x12);
 	}
 };

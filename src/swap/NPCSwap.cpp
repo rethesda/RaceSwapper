@@ -1,5 +1,3 @@
-#pragma once
-
 #include "NPCSwap.h"
 #include "Utils.h"
 

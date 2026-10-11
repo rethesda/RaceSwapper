@@ -50,7 +50,7 @@ struct HasOverlaysHook
 			range = 0x1F;
 		}
 		std::uintptr_t start = target.address();
-		std::uintptr_t end = target.address() + 0x1D;
+		std::uintptr_t end = target.address() + range;
 		REL::safe_fill(start, REL::NOP, end - start);
 
 		auto jmp = ASMJmp((std::uintptr_t)thunk, end);

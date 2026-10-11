@@ -1,11 +1,12 @@
-#pragma once
-
 #include "NPCAppearance.h"
-#include "configuration/Configuration.h"
 #include "NPCSwap.h"
+#include "RE/C/Character.h"
+#include "RE/E/ExtraEnableStateParent.h"
+#include "RE/P/ProcessLists.h"
 #include "RaceSwap.h"
 #include "SexSwap.h"
 #include "Utils.h"
+#include "configuration/Configuration.h"
 
 static void UpdateLoadedActors(RE::TESNPC* a_npc) {
 	for (auto actorHandle : RE::ProcessLists::GetSingleton()->highActorHandles) {

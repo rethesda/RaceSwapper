@@ -1,4 +1,5 @@
 #pragma once
+#include "RE/C/Character.h"
 #include "Utils.h"
 #include "swap/NPCAppearance.h"
 

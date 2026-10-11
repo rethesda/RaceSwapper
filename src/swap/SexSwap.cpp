@@ -1,10 +1,10 @@
 #include "SexSwap.h"
 #include "PCH.h"
+#include "RE/B/BGSColorForm.h"
+#include "RE/B/BGSTextureSet.h"
 #include "RaceSwapDatabase.h"
 #include "RaceSwapUtils.h"
 #include "Utils.h"
-
-
 
 std::string GetSexAsName(RE::SEX a_sex)
 {
@@ -287,7 +287,7 @@ bool SexSwap::DoTints(raceutils::RandomGen rand_gen, NPCAppearance::NPCData* a_d
 
 		logger::info("  NPC has no skin tone. Skin tone assigned to RGB:{}|{}|{}", skin_tint->tintColor.red, skin_tint->tintColor.green, skin_tint->tintColor.blue);
 	} else if (!skintone_tintasset) {
-		logger::info("  NPC has no skin tone. And Race: {} Sex: {} has no default skin tone.", utils::GetFormEditorID(a_data->race).c_str(), a_data->sex);
+		logger::info("  NPC has no skin tone. And Race: {} Sex: {} has no default skin tone.", utils::GetFormEditorID(a_data->race).c_str(), (std::uint32_t) a_data->sex);
 		return false;
 	}
 

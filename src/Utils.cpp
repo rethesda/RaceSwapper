@@ -1,5 +1,12 @@
 #include "Utils.h"
 #include "PCH.h"
+#include "RE/B/BGSListForm.h"
+#include "RE/B/BGSSaveLoadManager.h"
+#include "RE/T/TESDataHandler.h"
+
+#include "RE/T/TESObjectARMA.h"
+#include "RE/T/TESObjectARMO.h"
+#include "RE/T/TESRace.h"
 #include "settings/Settings.h"
 
 #undef GetObject
@@ -24,7 +31,7 @@ namespace utils
 
 		std::string playthroughID = "";
 		if (Settings::GetSingleton()->features.any(Settings::Features::kPlaythroughRandomization)) {
-			playthroughID = std::to_string(RE::BGSSaveLoadManager::GetSingleton()->currentPlayerID);
+			playthroughID = std::to_string(RE::BGSSaveLoadManager::GetSingleton()->currentCharacterID);
 		}
 
 		return rawFormID + "_" + fileName + "_" + playthroughID;
@@ -36,7 +43,7 @@ namespace utils
 
 		long p = 16777619;
 		size_t hash = 2166136261L;
-		for (int i = 0; i < data.length(); i++) {
+		for (size_t i = 0; i < data.length(); i++) {
 			hash = (hash ^ data[i]) * p;
 			hash += hash << 13;
 			hash ^= hash >> 7;
@@ -306,7 +313,7 @@ namespace utils
 			return false;
 		}
 		RE::FormID werewolfRaceID = 0xCDD84;
-		RE::FormID vampireRaceID = RE::TESDataHandler().GetSingleton()->LookupFormID(0x283A, "Dawnguard.esm");
+		RE::FormID vampireRaceID = RE::TESDataHandler::GetSingleton()->LookupFormID(0x283A, "Dawnguard.esm");
 		RE::TESRace* werewolfRace = RE::TESForm::LookupByID(werewolfRaceID)->As<RE::TESRace>();
 		RE::TESRace* vampireRace = RE::TESForm::LookupByID(vampireRaceID)->As<RE::TESRace>();
 		return a_race->formID == werewolfRace->formID || a_race->formID == vampireRace->formID;

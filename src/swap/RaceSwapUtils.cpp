@@ -1,5 +1,8 @@
 #include "RaceSwapUtils.h"
 #include "PCH.h"
+#include "RE/B/BGSColorForm.h"
+#include "RE/B/BGSTextureSet.h"
+#include "RE/T/TESRace.h"
 #include "RaceSwapDatabase.h"
 
 namespace raceutils
@@ -48,7 +51,10 @@ namespace raceutils
 		case Type::kScar:
 			{
 				types |= HDPTType::Scar;
+				break;
 			}
+		default:
+			break;
 		}
 
 		for (auto& [charString, characteristic] : raceswap::DataBase::HDPTCharMap) {
@@ -89,7 +95,7 @@ namespace raceutils
 		std::map<_likelihood_t, std::vector<RE::BGSHeadPart*>> likelihood_map;
 
 		_likelihood_t max = 0;
-		for (int i = 0; i < src_hdpts.size(); i++) {
+		for (size_t i = 0; i < src_hdpts.size(); i++) {
 			auto likelihood = _match(dst, *(src_hdpts[i].second));
 			if (likelihood > max)
 				max = likelihood;
@@ -137,7 +143,7 @@ namespace raceutils
 		std::map<_likelihood_t, std::vector<RE::BGSTextureSet*>> likelihood_map;
 
 		_likelihood_t max = 0;
-		for (int i = 0; i < src_data.size(); i++) {
+		for (size_t i = 0; i < src_data.size(); i++) {
 			auto likelihood = _match(dst, src_data[i]);
 			if (likelihood > max)
 				max = likelihood;
