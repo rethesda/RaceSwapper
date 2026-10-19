@@ -14,7 +14,7 @@ endif()
 
 set(NAME "RaceSwapper")
 set(AUTHOR "nightfallstorm")
-set(VERSION 1.5.8)
+set(VERSION 1.6.0)
 
 
 # For Clang-CL only, ensures IDEs like CLION properly see CLIB-NG headers
